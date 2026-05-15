@@ -22,7 +22,7 @@ PsychAI comes in two versions. You're reading the **Option B (prompt) guide**.
 | Standout feature | Works with any AI, free tier is fine | Auto-reads local files, profile saves permanently |
 | Best for | Users who want to try it quickly | Users who want the full automated experience |
 
-For a more complete experience, see the **Option A guide** (included in the same package).
+For a more complete experience, see the [**Option A guide**](../../skill/simpcn/psychai_readme_A_simpcn.md).
 
 ---
 
