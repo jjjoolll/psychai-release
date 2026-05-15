@@ -24,6 +24,8 @@ PsychAI 有两个版本，你正在看的是 **Option B（提示词版）**。
 
 如果你想要更完整的体验，可以参考 [**Option A 说明书**](../../skill/simpcn/psychai_readme_A_simpcn.md)。
 
+如果你已经是 Option A 用户，需要在没有 Claude Code 的设备上临时使用 PsychAI，可以用 Option B 过渡：把本地 `.profile.md` 的内容复制出来，在新对话开头以快照格式（`【PsychAI档案快照】`）传入，分析会直接从你的现有档案继续，不需要重新走问卷。
+
 ---
 
 ## 开始之前需要准备什么
