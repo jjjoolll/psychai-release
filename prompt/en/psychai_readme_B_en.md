@@ -22,7 +22,7 @@ PsychAI comes in two versions. You're reading the **Option B (prompt) guide**.
 | Standout feature | Works with any AI, free tier is fine | Auto-reads local files, profile saves permanently |
 | Best for | Users who want to try it quickly | Users who want the full automated experience |
 
-For a more complete experience, see the [**Option A guide**](../../skill/simpcn/psychai_readme_A_simpcn.md).
+For a more complete experience, see the [**Option A guide**](../../skill/en/psychai_readme_A_en.md).
 
 Already an Option A user and need to use PsychAI on a device without Claude Code? Option B works as a fallback: copy your local `.profile.md` content, paste it at the start of a new conversation using the snapshot format (`[PsychAI Profile Snapshot]`), and the analysis will pick up from your existing profile — no need to redo the questionnaire.
 

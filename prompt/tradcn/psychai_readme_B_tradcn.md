@@ -22,7 +22,7 @@ PsychAI 有兩個版本，你正在看的是 **Option B（提示詞版）**。
 | 特色 | 任何 AI 均可，免費版足夠 | 自動讀取本地檔案，分析結果持久保存 |
 | 適合誰 | 想快速體驗的使用者 | 想要完整自動化體驗的使用者 |
 
-如果你想要更完整的體驗，可以參考 [**Option A 說明書**](../../skill/simpcn/psychai_readme_A_simpcn.md)。
+如果你想要更完整的體驗，可以參考 [**Option A 說明書**](../../skill/tradcn/psychai_readme_A_tradcn.md)。
 
 如果你已經是 Option A 使用者，需要在沒有 Claude Code 的裝置上臨時使用 PsychAI，可以用 Option B 過渡：把本機 `.profile.md` 的內容複製出來，在新對話開頭以快照格式（`【PsychAI檔案快照】`）傳入，分析會直接從你的現有檔案繼續，不需要重新走一遍問卷。
 
