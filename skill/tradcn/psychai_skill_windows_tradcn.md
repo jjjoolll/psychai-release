@@ -1,5 +1,5 @@
 # PsychAI — Claude Code Skill（Windows 版·繁中版）
-# 作者：伪63
+# 作者：偽63
 # 文件名：psychai.md
 # 安裝位置：%USERPROFILE%\.claude\skills\psychai.md 或專案 .claude\skills\psychai.md
 # 觸發指令：/psychai
@@ -1620,3 +1620,4 @@ AI 基於對該角色的理解，生成風格規則，寫入 `style_config.md`�
 
 本 skill 的方法論體系由**偽63**設計與開發，基於其個人心理分析專案的實踐經驗建構。
 所有心理學框架均來自原典學術文獻，不含任何使用者個人資訊。
+如需轉載或二次開發，請注明來源。

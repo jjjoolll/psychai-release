@@ -1621,3 +1621,4 @@ Opening suggestion for next session:
 
 The methodology of this skill was designed and developed by **Wei63**, built on the practical experience of their personal psychological analysis project.
 All psychological frameworks are drawn from original academic literature and contain no personal user information.
+Please credit the source if you reproduce or build upon this work.
