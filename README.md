@@ -39,8 +39,8 @@
 
 | 语言 | Skill 文件 | 说明书 |
 |------|-----------|--------|
-| 简体中文（Windows） | [skill/simpcn/psychai_skill_windows.md](skill/simpcn/psychai_skill_windows.md) | [说明书](skill/simpcn/psychai_readme_A_simpcn.md) |
-| 简体中文（macOS） | [skill/simpcn/psychai_skill_mac.md](skill/simpcn/psychai_skill_mac.md) | [说明书](skill/simpcn/psychai_readme_A_simpcn.md) |
+| 简体中文（Windows） | [skill/simpcn/psychai_skill_windows_simpcn.md](skill/simpcn/psychai_skill_windows_simpcn.md) | [说明书](skill/simpcn/psychai_readme_A_simpcn.md) |
+| 简体中文（macOS） | [skill/simpcn/psychai_skill_mac_simpcn.md](skill/simpcn/psychai_skill_mac_simpcn.md) | [说明书](skill/simpcn/psychai_readme_A_simpcn.md) |
 | 繁體中文（Windows） | [skill/tradcn/psychai_skill_windows_tradcn.md](skill/tradcn/psychai_skill_windows_tradcn.md) | [說明書](skill/tradcn/psychai_readme_A_tradcn.md) |
 | 繁體中文（macOS） | [skill/tradcn/psychai_skill_mac_tradcn.md](skill/tradcn/psychai_skill_mac_tradcn.md) | [說明書](skill/tradcn/psychai_readme_A_tradcn.md) |
 | English (Windows) | [skill/en/psychai_skill_windows_en.md](skill/en/psychai_skill_windows_en.md) | [Guide](skill/en/psychai_readme_A_en.md) |

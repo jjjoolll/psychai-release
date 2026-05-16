@@ -1,5 +1,5 @@
 """
-check_skill_sync.py — 检查 psychai_skill_mac.md 和 psychai_skill_windows.md 的共享段落是否同步
+check_skill_sync.py — 检查 psychai_skill_mac_simpcn.md 和 psychai_skill_windows_simpcn.md 的共享段落是否同步
 
 共享段落定义：以下这些章节在两个 skill 文件里应该完全一致，因为它们与操作系统无关：
 - 第三节 C：口吻设定协议
@@ -61,8 +61,8 @@ def extract_section(content: str, start_marker: str, end_marker: str) -> str:
 
 def main():
     base = Path(__file__).parent
-    mac_path = base / 'psychai_skill_mac.md'
-    win_path = base / 'psychai_skill_windows.md'
+    mac_path = base / 'simpcn' / 'psychai_skill_mac_simpcn.md'
+    win_path = base / 'simpcn' / 'psychai_skill_windows_simpcn.md'
 
     if not mac_path.exists():
         print(f"找不到：{mac_path}")

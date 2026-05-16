@@ -3,7 +3,7 @@
 # Filename: psychai.md
 # Installation path: %USERPROFILE%\.claude\skills\psychai.md or project .claude\skills\psychai.md
 # Trigger command: /psychai
-# Platform: Windows (macOS users, use psychai_skill_mac.md instead)
+# Platform: Windows (macOS users, use psychai_skill_mac_en.md instead)
 
 ---
 

@@ -101,7 +101,7 @@ claude
 
 | 文件 | 说明 |
 |------|------|
-| `psychai_skill_windows.md`（Windows 用）或 `psychai_skill_mac.md`（macOS 用） | 按你的系统选择对应版本 |
+| `psychai_skill_windows_simpcn.md`（Windows 用）或 `psychai_skill_mac_simpcn.md`（macOS 用） | 按你的系统选择对应版本 |
 
 > 文件读取脚本 `extract_text.py` 由 Skill 在首次运行时自动创建，**不需要手动下载**。
 

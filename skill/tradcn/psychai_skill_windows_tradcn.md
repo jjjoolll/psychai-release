@@ -3,7 +3,7 @@
 # 文件名：psychai.md
 # 安裝位置：%USERPROFILE%\.claude\skills\psychai.md 或專案 .claude\skills\psychai.md
 # 觸發指令：/psychai
-# 適用平台：Windows（macOS 使用者請使用 psychai_skill_mac.md）
+# 適用平台：Windows（macOS 使用者請使用 psychai_skill_mac_tradcn.md）
 
 ---
 

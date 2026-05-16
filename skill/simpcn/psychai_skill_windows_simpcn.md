@@ -1,21 +1,9 @@
-﻿# PsychAI — Claude Code Skill（macOS 版 · 试运行 · 简中版）
+# PsychAI — Claude Code Skill（Windows 版·简中版）
 # 作者：伪63
 # 文件名：psychai.md
-# 安装位置：~/.claude/skills/psychai.md 或项目 .claude/skills/psychai.md
+# 安装位置：%USERPROFILE%\.claude\skills\psychai.md 或项目 .claude\skills\psychai.md
 # 触发命令：/psychai
-# 适用平台：macOS（Windows 用户请使用 psychai_skill_windows.md）
-
----
-
-## ⚠️ 试运行版本说明（必读）
-
-本版本为 macOS 试运行版，相较 Windows 完备版**目前缺失以下功能**：
-
-- **没有 WeFlow 微信解密集成**：Mac 版暂未对接 WeFlow（GitHub 上 `hicccc77/WeFlow` 项目据称提供 Mac 版本，作者尚未实测；后续会补齐对应章节）
-- **微信聊天记录只能手动接入**：用户需在另一台 Windows 电脑上用 WeFlow 导出 JSON 后传到 Mac，或直接手动整理对话文本
-- **wxid 全程需用户手动提供**：没有自动从配置文件 / API 获取的路径
-
-不影响的功能（与 Windows 版完全一致）：录音转写分析、日记/手写文本分析、PDF 文档解析、Pages 文档解析（textutil）、11 大心理学框架、动态问卷、跨会话连续档案。
+# 适用平台：Windows（macOS 用户请使用 psychai_skill_mac_simpcn.md）
 
 ---
 
@@ -42,20 +30,20 @@
 
 ## 第一节：检查工作目录
 
-首先确认工作目录是否存在。用户的 PsychAI 工作目录为 `~/psychai`（即 `/Users/[用户名]/psychai/`）。
+首先确认工作目录是否存在。用户的 PsychAI 工作目录为 `C:\Users\[用户名]\psychai\`。
 
-实际路径每次运行都直接用 `Path.home() / 'psychai'` 计算（无需保存到文件中，因为 `Path.home()` 在同一台机器上始终返回相同值）。后续所有文件操作均以此为根目录。**不要硬编码 `~/...`**——一律用 Python 解析后的绝对路径。
+实际路径每次运行都直接用 `Path.home() / 'psychai'` 计算（无需保存到文件中，因为 `Path.home()` 在同一台机器上始终返回相同值）。后续所有文件操作均以此为根目录。**不要硬编码 `C:\Users\...`**——一律用 Python 解析后的绝对路径。
 
-**检查并创建目录结构**（用 bash 完成）：
+**检查并创建目录结构**（用 Python 完成，跨 shell 兼容）：
 
 需要创建的目录结构：
 ```
-~/psychai/
-  input/
-    recordings/    ← 录音转写文本文件（.txt, .md）
-    diary/         ← 日记、随手写的任何文字
-    wechat/        ← 微信聊天记录导出文件
-  analysis/
+C:\Users\[用户名]\psychai\
+  input\
+    recordings\    ← 录音转写文本文件（.txt, .md）
+    diary\         ← 日记、随手写的任何文字
+    wechat\        ← 微信聊天记录导出文件
+  analysis\
     profile_core.md         ← 人格核心（Big Five / 防御机制 / 认知扭曲 / 图式）
     profile_attachment.md   ← 依恋与关系基础（依恋风格 / 客体关系 / 自体需求）
     profile_family.md       ← 亲情（父母 / 家庭 / 早期经历）
@@ -74,57 +62,61 @@
 ```
 
 需要检查的核心文件（路径均以 `work_dir` 为根）：
-- `{work_dir}/analysis/profile_core.md` — 人格核心（不存在则为首次运行）
-- `{work_dir}/analysis/profile_attachment.md` — 依恋与关系基础
-- `{work_dir}/analysis/profile_family.md` — 亲情
-- `{work_dir}/analysis/profile_friendship.md` — 友情
-- `{work_dir}/analysis/profile_career.md` — 学业与职业
-- `{work_dir}/analysis/profile_emotion.md` — 情绪调节
-- `{work_dir}/analysis/profile_narrative.md` — 自我叙事与核心伤口
-- `{work_dir}/analysis/change_plans.md` — 自我改变方案
-- `{work_dir}/analysis/knowledge.md` — 知识记录
-- `{work_dir}/.state.json` — 状态记录（对话轮次、档案版本、上次运行时间）
+- `{work_dir}\analysis\profile_core.md` — 人格核心（不存在则为首次运行）
+- `{work_dir}\analysis\profile_attachment.md` — 依恋与关系基础
+- `{work_dir}\analysis\profile_family.md` — 亲情
+- `{work_dir}\analysis\profile_friendship.md` — 友情
+- `{work_dir}\analysis\profile_career.md` — 学业与职业
+- `{work_dir}\analysis\profile_emotion.md` — 情绪调节
+- `{work_dir}\analysis\profile_narrative.md` — 自我叙事与核心伤口
+- `{work_dir}\analysis\change_plans.md` — 自我改变方案
+- `{work_dir}\analysis\knowledge.md` — 知识记录
+- `{work_dir}\.state.json` — 状态记录（对话轮次、档案版本、上次运行时间）
 
 ---
 
 ## 第二节：判断运行模式
 
-### 0. Python 可用性探测（必须先于任何 `python3` 命令执行）
+### 0. Python 可用性探测（必须先于任何 `python` 命令执行）
 
-无论模式一还是模式二，第一步都必须先验证 `python3` 真实可用——macOS 11 (Big Sur) 后系统不再预装 `python`，需要用户从 python.org 下载或通过 Homebrew 安装。即便已安装，PATH 中可能指向不可用版本。
+无论模式一还是模式二，第一步都必须先验证 Python 真实可用——Windows 10/11 默认带一个 `python.exe` 但实际是 Microsoft Store 跳转 stub，直接调用会弹出应用商店页面而不报错，导致后续 Python 命令全部静默失败。
 
-```bash
-pyVer=$(python3 --version 2>&1)
-pyExit=$?
-pyOk=false
-pyReason=''
-if [ $pyExit -ne 0 ]; then
-    pyReason='not_found'
-elif [[ "$pyVer" =~ ^Python\ ([0-9]+)\.([0-9]+) ]]; then
-    major="${BASH_REMATCH[1]}"
-    minor="${BASH_REMATCH[2]}"
-    if [ "$major" -gt 3 ] || { [ "$major" -eq 3 ] && [ "$minor" -ge 8 ]; }; then
-        pyOk=true
-    else
-        pyReason="too_old:$major.$minor"
-    fi
-else
-    pyReason='unrecognized'
-fi
+```powershell
+$pyVer = python --version 2>&1
+$pyOk = $false
+$pyReason = ''
+if ($LASTEXITCODE -ne 0) {
+    $pyReason = 'not_found'      # 命令找不到
+} elseif ($pyVer -match 'Microsoft Store') {
+    $pyReason = 'store_stub'     # 应用商店跳转 stub
+} elseif ($pyVer -match 'Python (\d+)\.(\d+)') {
+    $major = [int]$Matches[1]
+    $minor = [int]$Matches[2]
+    if ($major -gt 3 -or ($major -eq 3 -and $minor -ge 8)) {
+        $pyOk = $true
+    } else {
+        $pyReason = "too_old:$major.$minor"   # 版本 < 3.8
+    }
+} else {
+    $pyReason = 'unrecognized'   # 输出格式异常
+}
 ```
 
-- `pyOk = true` → Python ≥ 3.8 可用，继续进入模式判断
-- `pyOk = false` → 根据 `pyReason` 给出针对性提示，告知用户后**立即终止本次运行**：
+- `$pyOk = true` → Python ≥ 3.8 可用，继续进入模式判断
+- `$pyOk = false` → 根据 `$pyReason` 给出针对性提示，告知用户后**立即终止本次运行**：
 
-| `pyReason` | 文案 |
+| `$pyReason` | 文案 |
 |------|------|
-| `not_found` | 我需要 Python 3 但你的系统里找不到 `python3` 命令。可以从 [python.org](https://www.python.org/downloads/) 下载（3.8 以上），或终端运行 `brew install python3`（前提是装了 Homebrew）。装完重新运行 `/psychai`。 |
-| `too_old:X.Y` | 检测到 Python X.Y，但 PsychAI 需要 3.8 以上版本（用到 f-string 等语法）。在终端运行 `brew upgrade python3`（Homebrew）或去 python.org 下载最新版。conda 用户：`conda update python`。 |
-| `unrecognized` | 检测到 `python3` 命令但版本输出格式异常（输出：[贴上 $pyVer]）。可能是非标准 Python 分发。请尝试 `python3 --version` 看实际输出，发给我。 |
+| `not_found` | 我需要 Python 但你的系统里找不到。请去 [python.org](https://www.python.org/downloads/) 下载安装（3.8 以上），**勾选 "Add Python to PATH"**。装完重新运行 `/psychai`。 |
+| `store_stub` | Windows 10/11 自带的 "python" 命令其实是 Microsoft Store 跳转链接，不是真正的 Python。请去 [python.org](https://www.python.org/downloads/) 下载安装（3.8 以上），**勾选 "Add Python to PATH"**。装完重新运行。 |
+| `too_old:X.Y` | 检测到 Python X.Y，但 PsychAI 需要 3.8 以上版本（用到 f-string 等语法）。请去 python.org 升级，或在终端运行 `python -m pip install --upgrade python`（如果有 conda：`conda update python`）。 |
+| `unrecognized` | 检测到 `python` 命令但版本输出格式异常（输出：[贴上 $pyVer]）。可能是非标准 Python 分发。请尝试 `python --version` 看实际输出，发给我。 |
 
-如果用户暂时不想装/升级 Python，可以提示：可以先把文件在 Pages/Word 里另存为 .txt 放入对应文件夹——但首次运行的目录创建仍需要 Python，至少要装一次。
+如果用户暂时不想装/升级 Python，可以提示：可以先把文件在 Word 里另存为 .txt 放入对应文件夹——但首次运行的目录创建仍需要 Python，至少要装一次。
 
-**模式二专属补充检查**：若 `.state.json` 已存在但 `python3` 突然不可用（用户在两次会话之间卸载/改 PATH），按上述告知用户重装，不要尝试任何后续 `python3 -c` 调用。
+**额外建议**：若用户系统已禁用 App Execution Aliases（设置 → 应用 → 应用执行别名），则 stub 不存在，`python` 命令会直接报"找不到"，更易识别。但默认 PATH 中包含 stub，所以必须按上面做版本字符串校验。
+
+**模式二专属补充检查**：若 `.state.json` 已存在但 Python 突然不可用（用户在两次会话之间卸载/改 PATH），按上述告知用户重装，不要尝试任何后续 `python -c` 调用。
 
 ---
 
@@ -134,7 +126,7 @@ fi
 
 用 Python 检查（跨平台）：
 ```python
-python3 -c "
+python -c "
 from pathlib import Path
 import json
 p = Path.home() / 'psychai' / '.state.json'
@@ -159,12 +151,9 @@ else:
 
 **1. 创建全部目录和工具文件**
 
-**创建目录结构**（Python，Windows / Mac / Linux 通用）：
-
-**重要**：macOS 系统自带的 Python 命令是 `python3`，而非 `python`（系统 `python` 默认不存在）。本文档所有命令统一使用 `python3`；若用户通过 pyenv / Homebrew / Anaconda 安装了 `python` 别名也可使用。
-
-```bash
-python3 -c "
+**创建目录结构**（Python，跨 shell 兼容）：
+```python
+python -c "
 from pathlib import Path
 base = Path.home() / 'psychai'
 for d in ['input/recordings', 'input/diary', 'input/wechat', 'analysis/exploration', 'tools']:
@@ -178,8 +167,8 @@ print('目录已创建：', base)
 ```python
 """
 extract_text.py — 统一文本提取工具
-支持：.docx（Word）/ .pages（macOS Pages）/ .pdf / .txt / .md
-用法：python3 extract_text.py <输入文件路径> <输出txt路径>
+支持：.docx（Word）/ .pages（旧版 Pages，少数情况）/ .pdf / .txt / .md
+用法：python extract_text.py <输入文件路径> <输出txt路径>
 """
 
 import sys
@@ -201,63 +190,61 @@ def extract_docx(path: str) -> str:
 
 
 def extract_pages(path: str) -> str:
-    """使用 macOS 内建 textutil 命令（支持新旧版 Pages）。"""
-    import subprocess as _subprocess
-    import tempfile as _tempfile
-    with _tempfile.NamedTemporaryFile(suffix='.txt', delete=False) as tmp:
-        tmp_path = tmp.name
-    try:
-        _subprocess.run(
-            ['textutil', '-convert', 'txt', path, '-output', tmp_path],
-            check=True, capture_output=True
-        )
-        with open(tmp_path, 'r', encoding='utf-8', errors='replace') as f:
-            return f.read()
-    finally:
-        if os.path.exists(tmp_path):
-            os.unlink(tmp_path)
+    """
+    Windows 上 .pages 提取：
+    - 旧版 XML 格式（iWork 2013 前）：正则提取
+    - 新版 .iwa 二进制（iWork 2013+）：无法解析，提示用户导出为 .docx
+    Pages 是 Mac 专属应用，Windows 用户极少遇到 .pages 文件。
+    """
+    with zipfile.ZipFile(path, 'r') as z:
+        names = z.namelist()
+        if 'Index/Document.xml' in names:
+            xml = z.read('Index/Document.xml').decode('utf-8', errors='replace')
+        elif 'index.xml' in names:
+            xml = z.read('index.xml').decode('utf-8', errors='replace')
+        else:
+            raise ValueError(
+                ".pages 文件为新版 .iwa 二进制格式，Windows 上无法直接提取。\n"
+                "请让对方在 Pages 中选择「文件 → 导出为 → Word (.docx)」后重新上传。"
+            )
+
+    paragraphs = []
+    for para_xml in re.findall(r'<sf:p[ >].*?</sf:p>', xml, re.DOTALL):
+        text = re.sub(r'<[^>]+>', '', para_xml).strip()
+        if text:
+            paragraphs.append(text)
+    if not paragraphs:
+        text = re.sub(r'<[^>]+>', ' ', xml)
+        text = re.sub(r'\s+', ' ', text).strip()
+        return text
+    return "\n\n".join(paragraphs)
 
 
 def extract_pdf(path: str) -> str:
     """
-    PDF 文字层提取：优先 pdfplumber，不可用时 fallback 到 macOS 内建 textutil。
-    扫描件无文字层会报错提示用户。
+    PDF 文字层提取（pdfplumber）。
+    适用文字型 PDF；扫描件无文字层会报错提示用户。
     """
     try:
         import pdfplumber as _pdfplumber
-        pages_text = []
-        with _pdfplumber.open(path) as pdf:
-            for page in pdf.pages:
-                text = page.extract_text()
-                if text:
-                    pages_text.append(text.strip())
-        if not pages_text:
-            raise ValueError(
-                "PDF 中未检测到文字层（可能是扫描件/图片 PDF）。\n"
-                "请将 PDF 用 Pages/Word 打开并另存为 .docx 后重新上传。"
-            )
-        return "\n\n".join(pages_text)
     except ImportError:
-        # fallback 到 macOS 内建 textutil
-        import subprocess as _subprocess, tempfile as _tempfile
-        with _tempfile.NamedTemporaryFile(suffix='.txt', delete=False) as tmp:
-            tmp_path = tmp.name
-        try:
-            _subprocess.run(
-                ['textutil', '-convert', 'txt', path, '-output', tmp_path],
-                check=True, capture_output=True
-            )
-            with open(tmp_path, 'r', encoding='utf-8', errors='replace') as f:
-                content = f.read()
-            if not content.strip():
-                raise ValueError(
-                    "PDF 中未检测到文字层（可能是扫描件/图片 PDF）。\n"
-                    "请将 PDF 用 Pages/Word 打开并另存为 .docx 后重新上传。"
-                )
-            return content
-        finally:
-            if os.path.exists(tmp_path):
-                os.unlink(tmp_path)
+        raise ImportError(
+            "PDF 提取需要 pdfplumber，请运行：pip install pdfplumber"
+        )
+
+    pages_text = []
+    with _pdfplumber.open(path) as pdf:
+        for page in pdf.pages:
+            text = page.extract_text()
+            if text:
+                pages_text.append(text.strip())
+
+    if not pages_text:
+        raise ValueError(
+            "PDF 中未检测到文字层（可能是扫描件/图片 PDF）。\n"
+            "请将 PDF 用 Word 打开并另存为 .docx 后重新上传。"
+        )
+    return "\n\n".join(pages_text)
 
 
 def extract_plain(path: str) -> str:
@@ -297,32 +284,32 @@ def extract(input_path: str, output_path: str):
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        print("用法：python3 extract_text.py <输入文件> <输出txt>")
+        print("用法：python extract_text.py <输入文件> <输出txt>")
         sys.exit(1)
     extract(sys.argv[1], sys.argv[2])
 ```
 
 将以上代码写入 `{work_dir}/tools/extract_text.py`（路径分隔符由系统决定，Python 自动处理）。
 
-**检测并安装依赖**：
+**检测并安装依赖**（PowerShell）：
 
 `python-docx`（docx 核心依赖，必装）：
-```bash
-python3 -c "from docx import Document" || pip3 install python-docx
+```powershell
+python -c "from docx import Document"; if ($LASTEXITCODE -ne 0) { pip install python-docx }
 ```
 
 `pdfplumber`（PDF 支持，按需）：
 - 检测时机：当 `input/` 下首次出现 `.pdf` 文件时
 - 检测命令：
-```bash
-python3 -c "import pdfplumber" || pip3 install pdfplumber
+```powershell
+python -c "import pdfplumber"; if ($LASTEXITCODE -ne 0) { pip install pdfplumber }
 ```
-- 若安装失败，extract_text.py 会自动 fallback 到 macOS 内建 `textutil`（处理文字型 PDF 足够）
+- pdfplumber 在 Windows 上必装，无 fallback
 
 **解析工作目录绝对路径**（Python，跨平台）：
 
 ```python
-python3 -c "from pathlib import Path; print(Path.home() / 'psychai')"
+python -c "from pathlib import Path; print(Path.home() / 'psychai')"
 ```
 
 将输出的路径记录为 `work_dir`，后续所有文件操作均使用此绝对路径。路径分隔符在 Windows 上自动为反斜杠，Mac/Linux 上为正斜杠，Python `Path` 对象自动处理，无需手动区分。
@@ -337,13 +324,21 @@ python3 -c "from pathlib import Path; print(Path.home() / 'psychai')"
   "questionnaire_progress": [],
   "files_analyzed": {},
   "wechat_last_read": {},
+  "weflow_api_enabled": false,
+  "weflow_endpoints": {},
+  "tracked_contacts": [],
+  "tracking_opted_out": false,
   "user_wxid": null,
   "summary_mode": true
 }
 ```
 
 字段说明：
-- `wechat_last_read`：key 为联系人 wxid 或群 chatroom id，value 为上次读取的最新消息时间戳（Unix 秒），用于增量分析。
+- `wechat_last_read`：key 为联系人 wxid 或群 chatroom id，value 为上次读取的最新消息时间戳（Unix 秒），用于增量拉取。
+- `weflow_api_enabled`：是否已开启 WeFlow HTTP API（端口 5031）。
+- `weflow_endpoints`：端点自动发现后写入的路由路径。
+- `tracked_contacts`：用户指定要持续追踪的联系人/群 id 列表（纯 contact id，不掺杂哨兵字符串）。
+- `tracking_opted_out`：用户是否明确拒绝追踪微信联系人。true → 跳过所有微信拉取询问；用户日后改主意可手动改回 false 或说"我要追踪 XX"触发更新。
 - `user_wxid`：用户本人微信 wxid，用于 is_me 判断。
 - `summary_mode`：是否维护 profile 文件顶部摘要块（默认 true；用户说"关掉摘要"时设为 false，摘要维护跳过，每次运行读全文）。
 - `questionnaire_progress`：问卷已覆盖域的列表（如 `["family", "friendship"]`），用于中途退出后下次从未覆盖域恢复。问卷全部完成时 `questionnaire_done = true`，此字段保留作为审计记录。
@@ -381,21 +376,49 @@ python3 -c "from pathlib import Path; print(Path.home() / 'psychai')"
 
 收到回应后，执行口吻提取与写入（见第三节 C：口吻设定协议），然后进入步骤 3。
 
-**3. 微信聊天记录接入说明**
+**3. WeFlow 初始检测 + wxid 获取**
 
-告知用户：
-> macOS 没有像 Windows 上 WeFlow 那样的微信本地数据库解密工具。如果你想分析微信聊天记录，有两种方式：
-> 1. 在另一台 Windows 电脑上用 WeFlow 导出 JSON，传到这台 Mac 上放入 `input/wechat/`
-> 2. 手动整理对话（复制粘贴成 txt 或 md），放入 `input/wechat/` 或 `input/diary/`
->
-> 其他材料（录音转写、日记、PDF 等）不受影响，正常放入对应文件夹即可。
+在等待用户回应的同时，后台执行以下检测（见第三节 WeFlow 部分），将结果写入 `.state.json`，并在开场介绍结尾追加一句。
 
-**wxid 设置**（仅当用户有微信 JSON 时需要）：
-> 为了识别哪些消息是你说的，请告诉我你的微信 wxid。
-> 在另一台 Windows 电脑上打开 WeFlow，在界面里找一下你自己的 wxid——一串以 `wxid_` 开头的字符。复制后发给我就行。
-> 一次告诉我就好，之后我会记住。
+**wxid 自动获取**（与 WeFlow 检测同步进行，按优先级尝试）：
 
-校验：用户回复必须以 `wxid_` 开头，否则要求重新提供。写入 `.state.json` 的 `user_wxid` 字段。
+```
+优先级一：从 WeFlow 配置文件直接读取
+  路径：用 Python 解析 `Path.home() / 'AppData' / 'Roaming' / 'weflow' / 'WeFlow-config.json'`
+       或 PowerShell：`$env:APPDATA\weflow\WeFlow-config.json`
+       （不要照搬"[当前用户名]"字面量——必须用环境变量或 Path.home() 解析）
+  字段：myWxid
+  关键校验：
+    - 读取 myWxid 字段后，检查其值是否以 "safe:" 开头
+    - 若以 "safe:" 开头 → 该字段已被 WeFlow 加密编码，无法直接使用，立即放弃优先级一，进入优先级二
+    - 若以 "wxid_" 开头 → 明文 wxid，写入 .state.json 的 user_wxid
+    - 若为空或字段不存在 → 进入优先级二
+
+优先级二：从 WeFlow API 获取（API 已开启时）
+  尝试 weflow_endpoints 中的 /me 或 /self 或 /user 类端点
+  调用方式（必须带超时，遵循"超时统一规则"）：
+    curl.exe -s --max-time 2 "http://localhost:5031{me端点}"
+  成功 → 提取 wxid 字段（同样需要 safe: 前缀检测），写入 user_wxid
+  失败、超时（curl 退出码 28）或返回 safe: 编码值 → 进入优先级三
+
+优先级三：引导用户手动提供
+  在开场介绍结尾追加：
+  "最后一件小事：打开 WeFlow，在界面里找一下你自己的 wxid
+   （一串以 wxid_ 开头的字符），复制后发给我就行。
+   这是我判断哪些消息是你说的话的依据，只需要告诉我一次。"
+  用户回复后 → 校验是否以 wxid_ 开头，是则写入 user_wxid，否则要求重新提供
+```
+
+wxid 写入后，所有聊天记录分析中的 is_me 判断统一使用 `user_wxid` 匹配 sender 字段。
+
+- 若检测到 WeFlow API 可用：
+  > 我检测到你已开启 WeFlow API，我可以直接读取你的微信记录。
+
+- 若 WeFlow API 不可用但可以引导配置：
+  > 如果你安装了微信，我也可以帮你配置 WeFlow 来读取聊天记录——不是必须的，你可以随时跳过这步。
+
+- 若 WeFlow 完全未安装：
+  > 如果你之后想接入微信聊天记录，我会引导你一步步配置。现在先跳过。
 
 **4. 等待用户回应口吻设定，然后询问可选功能**
 
@@ -420,7 +443,7 @@ python3 -c "from pathlib import Path; print(Path.home() / 'psychai')"
 
 工作目录与首次运行相同，直接计算（无需从文件中读取）：
 ```python
-python3 -c "from pathlib import Path; print(Path.home() / 'psychai')"
+python -c "from pathlib import Path; print(Path.home() / 'psychai')"
 ```
 将此路径记为 `work_dir`，然后依次读取：
 
@@ -431,12 +454,27 @@ python3 -c "from pathlib import Path; print(Path.home() / 'psychai')"
    **存在性检查**：对每个 profile 文件单独 `Path.exists()` 判断，存在则读取，不存在则当作"该领域档案为空"跳过（首次问卷完成但未传材料时，这些文件可能尚未生成；缺失不应导致流程中断）
 4. `{work_dir}/.state.json` — 读取运行状态（sessions / questionnaire_done / wechat_last_read 等）
 
-**2. 扫描新文件**
+**2. 重新检测 WeFlow 状态**
 
-扫描 `{work_dir}/input/` 下的所有文件，与 `.state.json` 中的 `files_analyzed` 对比，找出需要分析的文件：
+每次运行都重新检测，不依赖 `.state.json` 里的历史状态：
 
-```bash
-python3 -c "
+```powershell
+curl.exe -s http://localhost:5031 --max-time 2
+```
+
+**重要**：必须用 `curl.exe`（强制调用真正的 curl 二进制），不能用 `curl` —— 后者在 PowerShell 里是 `Invoke-WebRequest` 的别名，不支持 `-s` 和 `--max-time` 参数。Windows 10 1803+ 自带 `curl.exe`。
+
+- 有响应 → 执行端点自动发现（见第三节 B），将结果写入 `.state.json`，`weflow_api_enabled = true`
+- 超时/失败 → `weflow_api_enabled = false`，清空 `weflow_endpoints`
+
+这样用户安装或卸载 WeFlow 后，下次运行自动感知，无需手动操作。
+
+**3. 扫描新文件**
+
+扫描 `{work_dir}\input\` 下的所有文件，与 `.state.json` 中的 `files_analyzed` 对比，找出需要分析的文件：
+
+```python
+python -c "
 from pathlib import Path
 import json, sys
 
@@ -470,27 +508,40 @@ print('\n'.join(to_analyze))
 - 用户确认后再进入第五节读取流程
 - 若发现单个文件 > 5MB（如错放的视频/压缩包），单独询问是否跳过
 
-**3. 检查微信 JSON 新消息**
+**4. 检查 WeFlow 新消息**（仅拉取，不在此步询问用户）
 
-若 `input/wechat/` 下有 JSON 文件，对每个文件：
-- 读取 JSON，识别联系人 id（从文件名或 JSON 结构中提取）
-- 过滤出 `timestamp > wechat_last_read[id]` 的新消息
-- 若有新消息：传入分析流程，更新 `wechat_last_read[id]`
+若步骤 2 检测到 WeFlow 可用：
+- **`tracking_opted_out = true`**：跳过整个步骤 4（用户已明确不追踪）
+- **`tracked_contacts` 非空**：执行 WeFlow 增量拉取
+  - API 模式：用 `weflow_endpoints.messages` 配合 `wechat_last_read[id]` 查询新消息
+  - 文件模式：读取 `input/wechat/` 下的 JSON，过滤新时间戳
+- **`tracked_contacts` 为空（且 `tracking_opted_out = false`）**：**不在此处询问**——记一个标记 `should_ask_tracking = true`，留到步骤 6 完成后作为一句自然对话提出（见步骤 7）
 
-**4. 告知用户**
+**5. 告知用户**
 
 > 欢迎回来。[情况汇总，选择适用的：]
 > - 发现 input/ 有 [N] 个新文件
-> - 微信 JSON 里读到 [N] 条新消息（[时间范围]）
+> - 从微信读到 [联系人名] 的 [N] 条新消息（[时间范围]）
 > - 没有新内容——你可以直接和我聊，或者把新材料放入 input/ 后重新运行 /psychai。
 
-**5. 问卷状态检查**
+**6. 问卷状态检查**
 
 读取 `.state.json` 中的 `questionnaire_done`：
 - `true` → 跳过问卷，直接进入新内容分析
 - `false` → 进入问卷协议（见第四节），完成后将 `questionnaire_done` 更新为 `true`
 
-**6. 读取并分析新内容**（见第五节）
+**7. 首次追踪联系人询问**（仅 `should_ask_tracking = true` 时）
+
+在主对话内容（分析结果/问卷开场）之后，以一句话自然引出：
+
+> 顺便问一下，你想让我持续追踪哪些微信联系人或群聊的对话吗？你可以说几个名字，我帮你找 ID；也可以说"暂时不需要"，下次不再问。
+
+用户回应分情况处理：
+- 提供名字 → 通过 `weflow_endpoints.contacts_search` 解析为 wxid/chatroom id，写入 `tracked_contacts`
+- 说"暂时不需要"/"不用"/"以后再说" → 设 `tracking_opted_out = true`
+- 用户日后改主意主动说"我要追踪 XX" → 设 `tracking_opted_out = false`，进入正常追踪流程
+
+**8. 读取并分析新内容**（见第五节）
 
 ---
 
@@ -502,18 +553,18 @@ print('\n'.join(to_analyze))
 |------|------|---------|
 | `.txt` / `.md` | ✅ | 直接读取（UTF-8 失败回退 GBK） |
 | `.docx` | ✅ | python-docx 段落提取 |
-| `.pages` | ✅ | 内建 textutil 命令（新旧版 Pages 全覆盖） |
-| `.pdf`（文字层）| ✅ | pdfplumber；不可用时 fallback 到 textutil |
-| `.pdf`（扫描件）| ❌ | 提示用户用 Pages/Word 打开另存为 .docx |
-| `.json` | ✅ | 用于结构化数据（如手动整理的聊天记录） |
-| 音频文件（.mp3/.m4a/.wav）| ❌ | **不支持**——recordings/ 文件夹只接受**已转写为 txt/md 的文字**，需先用其他工具转写（如 macOS 备忘录的实时转写、Whisper） |
+| `.pages` | ⚠️ | 仅旧版 XML 可读；新版 .iwa 报错提示让对方在 Mac 上导出为 .docx（Pages 是 Mac 专属，Windows 用户极少遇到） |
+| `.pdf`（文字层）| ✅ | pdfplumber 提取 |
+| `.pdf`（扫描件）| ❌ | 提示用户用 Word 打开另存为 .docx |
+| `.json` | ✅ | WeFlow 导出的结构化数据 |
+| 音频文件（.mp3/.m4a/.wav）| ❌ | **不支持**——recordings/ 文件夹只接受**已转写为 txt/md 的文字**，需先用其他工具转写（剪映、Whisper、PotPlayer 自带等） |
 | 图片（.jpg/.png/截图）| ⚠️ | 当前 skill 不读 input/ 下的图片；用户可直接在对话里粘贴图片，Claude 视觉能力会读 |
 
-**通用规则**：`.docx` / `.pages` / `.pdf` 必须先复制到 ASCII 临时路径（如 `/tmp/`），再用 `tools/extract_text.py` 提取（中文路径会导致 Bash 读取失败）。
+**通用规则**：`.docx` / `.pdf` 必须先复制到 ASCII 临时路径，再用 `tools/extract_text.py` 提取（中文路径会导致命令行读取失败）。**临时目录用系统 TEMP**（`$env:TEMP` 或 Python `tempfile.gettempdir()`），不要硬编码 `C:\tmp\`——Windows 默认不创建该目录，且用户可能没有写权限。
 
 **提取脚本完整性检查**（模式二每次首次需要提取时执行一次）：
-```bash
-python3 -c "
+```python
+python -c "
 from pathlib import Path
 script = Path.home() / 'psychai' / 'tools' / 'extract_text.py'
 if not script.exists() or script.stat().st_size < 1000:
@@ -525,14 +576,32 @@ else:
 - 输出 `OK` → 正常使用
 - 输出 `NEEDS_REBUILD` → 脚本误删 / 被截断 / 损坏 → 触发首次运行的"创建 tools/extract_text.py"流程重新写入（第一节中已定义完整脚本内容）；告知用户："文本提取脚本不存在，已自动重建。"
 
-### docx / pages / pdf 提取命令
+### docx / pdf 提取命令（PowerShell）
 
-```bash
-cp "原始路径/文件.docx" /tmp/temp_input.docx
-python3 ~/psychai/tools/extract_text.py /tmp/temp_input.docx /tmp/temp_output.txt
+```powershell
+# 临时路径用系统 TEMP（通常 C:\Users\[用户名]\AppData\Local\Temp）
+$tmpDir = $env:TEMP
+Copy-Item "原始路径\文件.docx" "$tmpDir\psychai_temp_input.docx" -Force
+python "$env:USERPROFILE\psychai\tools\extract_text.py" "$tmpDir\psychai_temp_input.docx" "$tmpDir\psychai_temp_output.txt"
 ```
 
-`.pages` 和 `.pdf` 文件同理，直接传入脚本，脚本根据后缀自动选择提取分支。
+或用 Python 跨平台版本：
+```python
+python -c "
+import tempfile, shutil, subprocess
+from pathlib import Path
+tmp = Path(tempfile.gettempdir())
+src = Path(r'原始路径\文件.docx')
+dst = tmp / 'psychai_temp_input.docx'
+out = tmp / 'psychai_temp_output.txt'
+shutil.copy(src, dst)
+script = Path.home() / 'psychai' / 'tools' / 'extract_text.py'
+subprocess.run(['python', str(script), str(dst), str(out)], check=True)
+print(out)
+"
+```
+
+`.pdf` 文件同理，直接传入脚本，脚本根据后缀自动选择提取分支。文件名加 `psychai_` 前缀避免与其他程序的临时文件冲突。
 
 ### 录音/转写文件的特殊规则
 
@@ -567,6 +636,229 @@ python3 ~/psychai/tools/extract_text.py /tmp/temp_input.docx /tmp/temp_output.tx
   - **WeChatMsg**（GitHub 开源项目）：支持 CSV / JSON / HTML 多种格式，推荐选 JSON 导出
   - **留痕**：导出为 HTML，解析后可提取文本内容，时间戳信息可能不完整
   - **其他工具**：放入文件夹后告知"这是用 XX 工具导出的"，会根据实际格式判断能否解析
+
+---
+
+## 第三节 B：WeFlow 集成协议
+
+### 验证状态声明（重要）
+
+本节描述的 WeFlow API 自动检测、端点自动发现、增量拉取流程**尚未经过实际验证**——WeFlow 的真实 API 路径、响应字段名（如 `createTime` vs `timestamp`、`isSelf` vs `is_me`）均是基于合理猜测，可能与实际不符。
+
+**遇错优先走兜底**：API 流程任一步失败时，立刻切换到"文件模式"——让用户在 WeFlow GUI 里手动导出 JSON 放入 `input/wechat/`。不要反复尝试 API。
+
+### WeFlow 是什么
+
+WeFlow 是一个微信聊天记录解密工具，它实时读取微信在本机的加密 SQLite 数据库，将其转换为可用格式。**WeFlow 本身不存数据**——微信运行时数据库持续更新，WeFlow 每次打开都直接读取最新状态，无需手动同步。
+
+### WeFlow 状态检测（每次运行均执行）
+
+按以下顺序检测，将结果写入 `.state.json`：
+
+**步骤一：检测 WeFlow API 是否可用，并自动发现端点**
+
+```powershell
+curl.exe -s http://localhost:5031 --max-time 2
+```
+
+**重要**：必须用 `curl.exe`（强制调用真正的 curl 二进制），不能用 `curl` —— 后者在 PowerShell 里是 `Invoke-WebRequest` 的别名，不支持 `-s` 和 `--max-time` 参数。Windows 10 1803+ 自带 `curl.exe`。
+
+- **超时/拒绝连接** → API 未开启，进入步骤二
+- **有响应** → API 正在运行，进入「端点自动发现」流程：
+
+**端点自动发现流程**：
+
+```
+1. 读取 http://localhost:5031 的响应内容
+
+2. 依次尝试常见文档路径，找到第一个有效的：
+   http://localhost:5031/swagger.json
+   http://localhost:5031/openapi.json
+   http://localhost:5031/api/docs
+   http://localhost:5031/docs
+   http://localhost:5031/api
+
+3. 情况A：返回 JSON 格式的接口文档（Swagger/OpenAPI）
+   → 解析其中所有路由，提取：
+     - 获取联系人列表的端点
+     - 获取聊天消息的端点（含时间过滤参数名）
+     - 搜索联系人的端点
+   → 将解析结果写入 .state.json 的 weflow_endpoints 字段
+
+4. 情况B：返回普通文本或 HTML
+   → 从页面内容中识别路由路径（以 / 开头的 URL 路径）
+   → 尝试调用识别到的路径，确认哪些有效
+   → 将有效端点写入 .state.json 的 weflow_endpoints 字段
+
+5. 情况C：无法自动识别任何端点
+   → 告知用户：
+     "WeFlow API 已开启，但我无法自动识别接口地址。
+      请打开浏览器，访问 http://localhost:5031，
+      把页面上显示的内容粘贴给我，我来解析。"
+   → 用户粘贴后，解析内容，写入 weflow_endpoints
+   → **兜底**：若用户粘贴的内容仍无法解析出任何可识别路径（含未粘贴、粘贴空白、粘贴的是错误页面/其他网址内容），则：
+     a. 设置 `weflow_api_enabled = false`、`weflow_endpoints = {}` 写入 `.state.json`
+     b. 告知用户："API 端点暂时无法识别，已切换到文件模式——你可以在 WeFlow 里手动导出 JSON 放入 `input/wechat/`，效果一样。下次运行我会自动重试 API 检测。"
+     c. 继续走文件模式流程，**不阻塞主流程**
+```
+
+`weflow_endpoints` 写入 `.state.json` 的格式：
+```json
+"weflow_endpoints": {
+  "contacts_list": "/实际路径",
+  "contacts_search": "/实际路径?参数名={keyword}",
+  "messages": "/实际路径?参数名={contact_id}&时间参数名={timestamp}"
+}
+```
+
+自动发现成功后：`weflow_api_enabled = true`，后续所有 API 调用均使用 `weflow_endpoints` 中的路径，不使用任何硬编码路径。
+
+**步骤二：检测 WeFlow 是否已安装**
+
+**不要**查固定的 .exe 路径——用户的实际安装位置千差万别（自定义安装目录、绿色版、便携版等）。改用三级覆盖法，任一命中即视为"已安装"：
+
+```powershell
+# 层级 A（首选，最快）：配置文件存在性
+# WeFlow 只要跑过一次就会在 %APPDATA%\weflow\ 下创建配置文件，位置固定
+$configPath = Join-Path $env:APPDATA "weflow\WeFlow-config.json"
+$layerA = Test-Path $configPath
+
+# 层级 B：注册表卸载项（覆盖标准 installer 安装）
+$regKeys = @(
+    'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*',
+    'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*',
+    'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*'
+)
+$layerB = $null -ne (Get-ItemProperty $regKeys -ErrorAction SilentlyContinue |
+    Where-Object { $_.DisplayName -like '*WeFlow*' } | Select-Object -First 1)
+
+# 层级 C：进程检测（兜底，覆盖正在跑的便携版）
+$layerC = $null -ne (Get-Process -Name 'WeFlow' -ErrorAction SilentlyContinue | Select-Object -First 1)
+
+# 综合判断
+$weflowInstalled = $layerA -or $layerB -or $layerC
+Write-Output "WeFlow installed: $weflowInstalled (A=$layerA, B=$layerB, C=$layerC)"
+```
+
+判断结果：
+- 任一层级命中 → 已安装，进入"引导开启 API"流程
+- 三级全部失败 → 未安装，进入"引导安装 WeFlow"流程
+
+**为何不再查 .exe 路径**：PsychAI 实际不需要 WeFlow.exe 的绝对路径——我们只需要：
+1. 读 `WeFlow-config.json` 取 `myWxid`（位置固定，与安装路径无关）
+2. 调 `http://localhost:5031` 的 HTTP API（与安装路径无关）
+
+所以检测的目标是"用户能否使用 WeFlow"，不是"WeFlow.exe 在哪"。三级覆盖法对任意安装位置都有效。
+
+---
+
+### 引导安装 WeFlow（未安装时）
+
+告知用户：
+> WeFlow 是一个用来读取微信聊天记录的工具。配置好之后，我可以自动读取你和指定联系人的对话，不需要你手动导出。
+>
+> 安装步骤：
+> 1. 前往 WeFlow 官方下载页面（自行搜索"WeFlow 微信导出"），下载 Windows 安装包
+> 2. 安装完毕后，**确保微信正在运行**，然后打开 WeFlow
+> 3. WeFlow 会自动找到微信数据目录并解密——这需要几分钟
+> 4. 配置完成后，在 WeFlow 设置里找到"HTTP API"，开启它（端口保持 5031）
+> 5. 完成后重新运行 `/psychai`
+>
+> 如果你暂时不想配置，直接告诉我，我们跳过这步——你之后可以随时手动把聊天记录导出为 JSON 放入 `input/wechat/`。
+
+---
+
+### 引导开启 WeFlow API（已安装但 API 关闭时）
+
+告知用户：
+> 我检测到你已安装了 WeFlow，但 HTTP API 尚未开启。开启后我可以直接读取微信记录，不需要你每次手动导出。
+>
+> 开启方法：打开 WeFlow → 设置 → HTTP API → 开启（端口 5031）→ 重启 WeFlow
+>
+> 如果你不想开启 API，也可以选择手动导出：在 WeFlow 里选择联系人，导出 JSON，放入 `input/wechat/` 文件夹。
+
+---
+
+### API 模式：增量拉取新消息
+
+适用条件：`weflow_api_enabled = true`、`tracked_contacts` 非空、`tracking_opted_out = false`。
+
+**每次运行时执行**：
+
+```
+从 .state.json 读取 weflow_endpoints（端点自动发现已写入）
+
+对每个 tracked_contacts 中的 id：
+  last_ts = wechat_last_read[id] 或 0
+  
+  用 weflow_endpoints.messages 构造请求：
+  curl.exe -s --max-time 5 "http://localhost:5031{messages端点}"
+  （将contact_id和timestamp填入对应参数；必须带 --max-time 防止 WeFlow 卡死时主流程挂起）
+  
+  若请求成功且返回消息不为空：
+    取出消息列表（含 content、sender、timestamp、is_me 或同义字段）
+    记录最新消息的 timestamp → 更新 wechat_last_read[id]
+    将新消息传入分析流程
+  
+  若返回为空、请求失败、或超时（curl 退出码 28）：
+    跳过该联系人，在会话结束时告知用户
+  
+  连续 3 个联系人请求全部超时：
+    判定 WeFlow API 不稳定，设 weflow_api_enabled = false，切到文件模式
+```
+
+**超时统一规则**：所有 `curl.exe` 调用 WeFlow（初始检测、端点发现、增量拉取、联系人搜索）必须带 `--max-time N`——初始检测/搜索用 2 秒，增量拉取用 5 秒（消息量可能较大）。
+
+**字段名适配**：WeFlow 返回的字段名可能与预期不同（如 `createTime` 而非 `timestamp`，`isSelf` 而非 `is_me`）。解析前先检查实际字段名，自动适配，不硬编码字段名。
+
+**联系人选择**（由模式二步骤 7 触发，不在拉取阶段询问）：
+> 你想让我追踪哪些联系人或群聊的对话？你可以说名字，我来帮你在 WeFlow 里找对应的 ID；也可以说"暂时不需要"，下次不再问。
+
+- 用户给名字 → 通过 `weflow_endpoints.contacts_search` 搜索联系人，将找到的 wxid/chatroom id 写入 `tracked_contacts`
+- 用户拒绝 → 设 `tracking_opted_out = true`
+
+---
+
+### 文件模式：手动导出 JSON 分析
+
+适用条件：WeFlow API 不可用，用户手动导出了 JSON 文件到 `input/wechat/`。
+
+**处理逻辑**：
+
+```
+扫描 input/wechat/ 下的所有 .json 文件
+对每个文件：
+  读取 JSON，识别联系人 id（从文件名或 JSON 结构中提取）
+  last_ts = wechat_last_read[id] 或 0
+  过滤出 timestamp > last_ts 的消息
+  若有新消息：传入分析流程，更新 wechat_last_read[id]
+  将文件路径和当前 mtime 写入 files_analyzed（files_analyzed[path] = mtime）
+```
+
+**JSON 格式兼容**：WeFlow 导出的 JSON 通常包含以下字段：
+- `sender`（发送者 wxid）
+- `content`（消息内容）
+- `createTime` 或 `timestamp`（Unix 时间戳，秒）
+- `isSelf` 或通过 wxid 比对判断是否为用户本人
+
+---
+
+### 微信消息分析规则
+
+**识别"用户本人"的消息**：
+统一使用 `.state.json` 中的 `user_wxid` 判断，按以下顺序匹配：
+1. 消息有 `isSelf = true` 或 `is_me = true` 字段 → 直接采用
+2. 消息的 `sender` 字段与 `user_wxid` 完全匹配 → 判定为本人
+3. 两者均无 → 标注为"发送者未知"，分析时跳过该条消息的归属判断
+
+**分析内容**：
+- 用户发出的消息：语言风格、表达模式、情绪状态、防御机制表现
+- 对话互动模式：关系亲疏、沟通风格、权力动态
+- 特别关注：用户在什么情境下打开话题、如何结束对话、回复速度变化
+
+**隐私原则**：
+- 分析结果只写入本地的 `analysis/` 文件夹
+- 不上传任何聊天内容到任何服务器
 
 ---
 
@@ -754,13 +1046,13 @@ AI基于对该角色的理解，生成风格规则，写入 `style_config.md`，
 
 > **任何文字都收**：日记、随手写的东西、任何你想到了就写下来的文字。放入 `input/diary/`。
 
-### WeChat 聊天记录接入
+### WeChat 导出引导（若用户有 WeFlow）
 
-macOS 没有原生的微信本地数据库解密工具。两条可行路径：
-
-> **路径一（推荐）**：在另一台 Windows 电脑上用 WeFlow 把对应联系人/群聊导出为 JSON，传到 Mac 上放入 `input/wechat/`。
-
-> **路径二**：直接从微信里复制对话文本到一个 .txt/.md 文件，放入 `input/wechat/` 或 `input/diary/`。这种方式不会有时间戳，分析会更粗，但仍然有用。
+> 如果你已经安装了 WeFlow，可以这样导出：
+> 1. 打开 WeFlow，选择你想分析的联系人或群聊
+> 2. 导出为 JSON 格式
+> 3. 放入 `input/wechat/` 文件夹
+> 4. 重新运行 `/psychai`，我会自动读取
 
 ---
 
@@ -1176,7 +1468,32 @@ macOS 没有原生的微信本地数据库解密工具。两条可行路径：
 
 ### 错误场景与处理脚本
 
-**场景一：文件读取失败**
+**场景一：WeFlow API 连接失败**
+
+触发条件：访问 `http://localhost:5031` 超时或被拒绝
+
+> 我刚才试着连接 WeFlow，但没有收到回应。
+> 最可能的原因是：WeFlow 还没打开，或者 API 功能没有开启。
+> 你能帮我做这两件事吗？
+> 1. 打开 WeFlow 软件
+> 2. 在 WeFlow 的设置里找到"HTTP API"或"API 服务"，确认它是开启状态
+> 做完之后告诉我，我重新连接一次。
+
+---
+
+**场景二：WeFlow API 返回了无法识别的格式**
+
+触发条件：API 有响应，但端点自动发现失败，无法解析出任何可用路由
+
+> 我连上了 WeFlow，但没能读懂它的接口说明。
+> 最可能的原因是：这个版本的 WeFlow 接口格式和我预期的不一样。
+> 你能帮我做一件事吗？
+> 打开浏览器，在地址栏输入 `http://localhost:5031`，按回车。
+> 把你看到的内容（文字或截图都行）发给我，我来自己解读。
+
+---
+
+**场景三：文件读取失败**
 
 触发条件：尝试读取 `input/` 或 `analysis/` 下的文件时报错（找不到文件、无法读取）
 
@@ -1187,39 +1504,39 @@ macOS 没有原生的微信本地数据库解密工具。两条可行路径：
 
 ---
 
-**场景二：聊天记录 JSON 格式无法解析**
+**场景四：聊天记录 JSON 格式无法解析**
 
 触发条件：读取 `input/wechat/` 下的 JSON 文件时结构不对，提取不到消息
 
 > 我读到了你放在 input/wechat/ 里的文件，但里面的格式我不认识，提取不出消息内容。
-> 最可能的原因是：这个文件不是从 WeFlow（或同类工具）导出的，或者导出时选了不同的格式。
+> 最可能的原因是：这个文件不是从 WeFlow 导出的，或者导出时选了不同的格式。
 > 你能告诉我这个文件是从哪里导出的，用什么方式导出的吗？
+> 如果是 WeFlow 导出的，请确认导出时选的是 JSON 格式而不是 Excel 或其他格式。
 
 ---
 
-**场景三：docx / pages / pdf 文件提取失败**
+**场景五：docx 或 pages 文件提取失败**
 
 触发条件：运行 `extract_text.py` 时报错，文本提取失败
 
 > 我试着读取这个文件 [文件名]，但没有成功。
 > 最可能的原因是：文件可能损坏了，或者格式有点特殊。
-> 你能试试把这个文件用 Pages 或 Word 打开，然后另存为 .txt 格式吗？
+> 你能试试把这个文件用 Word（或 Pages）打开，然后另存为 .txt 格式吗？
 > 存好之后放回原来的文件夹，告诉我，我重新读一次。
 
 ---
 
-**场景四：找不到用户 wxid**
+**场景六：找不到用户 wxid**
 
-触发条件：用户提供的 wxid 不符合 `wxid_` 开头格式，或拒绝提供
+触发条件：WeFlow 配置文件不存在、API 没有 /me 端点、用户也没有手动提供
 
 > 我需要知道你的微信账号 ID（wxid），才能判断哪些聊天消息是你说的。
-> 在另一台 Windows 电脑上打开 WeFlow，在界面里找一下你自己的 wxid——一串以 `wxid_` 开头的字符。复制后发给我。
-> 不确定的话把你看到的都发给我，我来判断。
-> 如果你暂时不需要分析微信记录，可以直接告诉我"跳过"，wxid 之后再说。
+> 打开 WeFlow，在界面里找一下你自己的 wxid——一串以 `wxid_` 开头的字符。复制后发给我就行。
+> 不确定哪个是的话，把你看到的都发给我，我来判断。
 
 ---
 
-**场景五：磁盘空间不足或没有写入权限**
+**场景七：磁盘空间不足或没有写入权限**
 
 触发条件：尝试写入 `analysis/` 文件夹时失败
 
