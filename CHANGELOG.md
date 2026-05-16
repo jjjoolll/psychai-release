@@ -4,6 +4,23 @@
 
 ---
 
+## [1.2.0] — 2026-05-15
+
+### Option A（Skill 版）
+- 新增：繁體中文版 Skill（Windows / macOS 各一份）及配套說明書
+- 新增：英文版 Skill（Windows / macOS 各一份）及配套 Guide
+- 改名：简中版 Skill 文件加 `_simpcn` 后缀，与繁中/英文版命名风格统一（`psychai_skill_windows_simpcn.md` / `psychai_skill_mac_simpcn.md`）
+- 修复：各语言 Skill 文件第 6 行平台交叉引用现指向同语言版本（不再混指简中文件）
+
+### Option B（提示词版）
+- 修复：繁中/英文说明书的"Option A 说明书"跳转链接改为各自语言对应版本（繁中→繁中，英文→英文）
+
+### 文档结构
+- 更新：主 README 新增繁體中文、English 两个语言板块（含各自的选版引导、文件链接、文档注释）
+- 更新：主 README 顶部加语言切换导航栏；声明 CHANGELOG / LIMITATIONS 仅提供简体中文版
+
+---
+
 ## [1.1.0] — 2026-05-15
 
 ### Option A（Skill 版）
