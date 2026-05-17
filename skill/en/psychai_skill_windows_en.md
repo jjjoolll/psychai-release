@@ -1,9 +1,10 @@
-# PsychAI — Claude Code Skill (Windows · English)
+# PsychAI — Claude Code Skill (Windows · English · v1.3)
 # Author: Wei63
 # Filename: psychai.md
 # Installation path: %USERPROFILE%\.claude\skills\psychai.md or project .claude\skills\psychai.md
 # Trigger command: /psychai
 # Platform: Windows (macOS users, use psychai_skill_mac_en.md instead)
+# v1.3 update (2026-05-16): Added Reflexivity Monitoring Protocol (Section 12) + /psychai self-check subcommand + first-run boundary disclosure + .state.json extended with reflexivity_state
 
 ---
 
@@ -23,6 +24,21 @@ If the user triggers this command with `snapshot` (i.e., `/psychai snapshot`), *
 3. Merge the files in the above order, separating each with a `---` divider and the file title, then output the complete profile
 4. Also write to `analysis/snapshot_[YYYYMMDD].md` (using the current date, e.g., `snapshot_20260515.md`), and tell the user the file path
 5. Inform the user: "Complete profile has been output and saved to `[path]/snapshot_[date].md`."
+
+After execution, do not continue the normal flow — this run is complete.
+
+---
+
+## Special Command: /psychai self-check (v1.3 new)
+
+If the user triggers this command with `self-check` (i.e., `/psychai self-check`), **skip the normal flow** and enter the full reflexivity self-check process (detailed in Section 12.2). Brief flow:
+
+1. Read the `reflexivity_state` field from `{work_dir}/.state.json`
+2. Ask the user the 4 core questions from Section 12.2 one at a time (one per turn, wait for each answer)
+3. Synthesize the 4 answers + historical state data to produce a risk assessment
+4. Output the self-check result (format in Section 12.2)
+5. Write to `analysis/exploration/reflexivity_check_[YYYYMMDD].md` and tell the user the file path
+6. Update `reflexivity_state.last_self_check = current date` in `.state.json`
 
 After execution, do not continue the normal flow — this run is complete.
 
@@ -352,6 +368,15 @@ Say the following to the user (warm and concise tone — adapt to the mood, don'
 > Your working directory is ready: `[actual value of work_dir]` (the path is saved — you don't need to remember it).
 >
 > **Privacy note**: All your materials and analysis results are stored locally throughout. Nothing is uploaded to any server.
+>
+> **First-use boundary disclosure** (shown only on first use; afterward, your understanding is assumed):
+> Psychology analysis tools can help you **understand yourself better**, but they can also let you **use psychology terminology to close yourself off**. This tool has 4 known reflexivity risks — **Defensive Entrenchment** (using terminology to justify inaction), **Over-Self-Observation** (auto-framing every behavior), **Identity Contraction** (the analyzed version becomes your "official self" while the rest gets marginalized), and **Zero-Resistance Acceptance** (swallowing conclusions wholesale and losing critical engagement).
+>
+> You can run `/psychai self-check` at any time and I will walk you through a complete 4-dimension review.
+>
+> **I strongly recommend doing a self-check every 1-2 weeks** — this is PsychAI's only built-in safety mechanism. If you don't actively use it, it has no effect.
+>
+> By default, your understanding is assumed. See Section 12 for the full monitoring protocol.
 >
 > What I can do:
 > - Read any text material you place in the `input/` folder (transcribed recordings, journals, chat logs), automatically analyze it, and build a psychological profile
@@ -1614,10 +1639,164 @@ Opening suggestion for next session:
 - Increment `sessions` by 1
 - Update `last_run` to the current date
 - Update `files_analyzed` for files analyzed this session: `files_analyzed[file_path] = current_mtime` (dict structure, no limit; files whose mtime hasn't changed are automatically skipped next time)
+- **`reflexivity_state` update (v1.3 new)**:
+  - Increment `analysis_count` by 1
+  - If this session triggered any Section 12.3 warning, append to `warnings_triggered[session_date] = [{type, snippet, timestamp}]`
+  - If the user expressed explicit resistance/correction/disagreement to any conclusion this session, append to `resistance_log = [{date, what_user_resisted}]`
+  - `last_self_check` is only updated by the `/psychai self-check` flow
+
+**4. Reflexivity automatic check (v1.3 new)**
+
+Before writing session_log, scan all user utterances from this session and **detect only clearly extreme patterns** (Section 12.3 triggers A/B). If matched:
+- Add a standalone `⚠️ Reflexivity Monitoring` warning to the end-of-session notice (format in 12.3)
+- Write to `reflexivity_state.warnings_triggered`
+- Do not block the flow
+
+If it has been more than 14 days since the last self-check, append a gentle reminder to the end-of-session notice:
+> By the way: it has been [N] days since your last reflexivity self-check. Consider running `/psychai self-check` when you have a moment.
 
 ---
 
-## Copyright Notice
+## Section 12: Reflexivity Monitoring Protocol (v1.3 new — core safety mechanism)
+
+### 12.1 Why this section exists
+
+PsychAI helps users understand themselves by naming and analyzing psychological patterns. **But this process itself can reshape the user** — the analysis changes the object being analyzed. This is a built-in side effect of the tool and must be monitored and contained.
+
+**4 reflexivity directions**:
+1. **Positive** (healthy): Analysis names a problem → user reflects → user actively changes
+2. **Defensive Entrenchment** (risk): User gains "higher-level language" to package a pattern → harder to change (typical phrasing: "I'm just a fearful-avoidant type, so I can't do XX")
+3. **Over-Self-Observation** (risk): Every daily behavior gets auto-framed → spontaneity damaged → performative self-awareness increases
+4. **Identity Contraction** (risk): The analyzed version becomes the user's "official self" → uncovered parts get marginalized
+
+The last three are reflexivity side effects, not the goal.
+
+---
+
+### 12.2 User-initiated self-check (`/psychai self-check` call)
+
+When the user runs `/psychai self-check` or says "run a reflexivity self-check" in conversation, **immediately stop any current topic** and ask the following 4 core questions one by one (one at a time, wait for each answer):
+
+**Question 1 (Identity Contraction / Defensive Entrenchment mixed)**:
+> Lately when you describe yourself, are you using more terminology from this profile ("avoidant type," "schema," "true/false self") instead of everyday language?
+
+**Question 2 (Defensive Entrenchment)**:
+> Have you started thinking "since I'm an X type, then X behavior is justified / unchangeable"?
+
+**Question 3 (Identity Contraction)**:
+> Have you noticed that when you describe daily events recently, you focus more on "analyzing my own psychology," and other dimensions (interests, new developments in relationships, external world reactions) come up less?
+
+**Question 4 (Zero-Resistance Acceptance)**:
+> Has it been a long time since you told me "I don't think so" or "it might be another reason" in response to one of my conclusions?
+
+**Evaluation rules**:
+- If **any one** of the 4 questions leans toward "yes" or "somewhat" → must point out the specific risk direction + give a corrective suggestion
+- All "no" → briefly confirm "no obvious reflexivity signs at present," do not manufacture warnings
+- Synthesize with the historical data in `.state.json`'s `reflexivity_state` (last 30 days of warnings_triggered + resistance_log) for trend judgments
+
+**Self-check output format** (standalone paragraph, visibly displayed):
+
+```
+⚠️ Reflexivity Self-Check Result
+
+Observed signals:
+- [which question the user leaned "yes" on + a snippet of their actual words]
+- [historical data: in the last N days, M automatic warnings were triggered; distribution by type]
+- [historical data: user's resistance/correction frequency in the last N days]
+
+Risk type: [one of the 4]
+
+What I suggest you do:
+- [specific actionable suggestion — e.g., "for the next week, deliberately describe yourself without terminology" or "deliberately bring up a topic I've never analyzed" etc.]
+
+Remember: analysis is a tool, you are you. Terminology can help you see, but it shouldn't replace your experience.
+```
+
+**Write to file**: Also write the self-check result to `analysis/exploration/reflexivity_check_[YYYYMMDD].md` and tell the user the path.
+
+---
+
+### 12.3 Automatic detection triggers (low-noise, high-precision; scanned each session end)
+
+The automatic check performed in Section 11 step 4. **Only detect clear, single-conversation-identifiable extreme cases** — avoid false positives.
+
+**Trigger A (Defensive Entrenchment)**:
+The user's reply contains one of the following phrasings:
+- "I'm just [framework term], so [I can't / I won't / that's just me]"
+- "Didn't you say I was X before? Then I'm X" (treating analysis as verdict)
+- "[Term], whatever, can't be changed"
+
+**Trigger B (Over-Self-Observation)**:
+When the user describes a specific everyday event (eating, class, interacting with a friend), they use **almost entirely psychology terminology**, with almost no everyday feelings / concrete behavior / sensory detail.
+
+**Trigger C (Zero-Resistance Acceptance, requires state)**:
+Based on statistics in `reflexivity_state.resistance_log`:
+- After the last 10 conclusory outputs (analyses written to profile), the user has **zero corrections and zero questions**
+- Or no resistance record in the last 30 days
+
+When matched, the trigger fires — but use it only during 12.2 manual self-check (to avoid per-session reminders and reduce noise).
+
+**Warning output format** (standalone paragraph, separated from normal analysis):
+
+```
+⚠️ Reflexivity Monitoring: Single-Instance Pattern Notice
+
+I noticed in what you just said: [direct quote of user's actual words]
+
+This is close to a pattern we should be cautious of: [one of the 4, with brief explanation]
+
+Not a conclusion — a reminder. This doesn't necessarily mean you've gone off track. But if this kind of phrasing recurs, it could be an early signal of [corresponding risk].
+
+I'll continue completing your request. I also suggest running `/psychai self-check` at an appropriate time for a full self-check.
+```
+
+After the warning, **continue completing the user's original request** — this is not blocking, it is a parallel reminder.
+
+---
+
+### 12.4 Boundary statement: what is NOT a reflexivity sign
+
+To avoid over-vigilance (which is itself a kind of reflexivity — the analyst over-warning), the following situations **should not trigger warnings**:
+
+- The user **precisely uses** terminology to name a **phenomenon that already existed in their mind** (this is terminology refinement and is healthy)
+- The user **proactively asks** "do I fit this framework?" (this is curiosity, not contraction)
+- The user says "yes" to **a specific conclusion** + explains why they think it's right (this is endorsement, not swallowing)
+- The user's description **is simply brief** (brevity ≠ over-framing)
+
+Criterion: **the core question is not whether terminology is used, but whether the terminology has replaced the user's own way of describing things and their willingness to explore.**
+
+---
+
+### 12.5 reflexivity_state field format in .state.json
+
+```json
+{
+  "reflexivity_state": {
+    "analysis_count": 0,
+    "last_self_check": null,
+    "warnings_triggered": {
+      "20260516": [
+        {"type": "defensive_entrenchment", "snippet": "user's actual words snippet", "timestamp": "ISO time"}
+      ]
+    },
+    "resistance_log": [
+      {"date": "20260516", "what_user_resisted": "the specific conclusion the user pushed back on"}
+    ]
+  }
+}
+```
+
+**Field notes**:
+- `analysis_count`: tracks how many analyses have been generated, used to compute self-check recommendation timing
+- `last_self_check`: date of the most recent `/psychai self-check` completion (ISO format); null = never run
+- `warnings_triggered`: history of auto-warnings, grouped by date
+- `resistance_log`: record of user resistance/correction/disagreement against conclusions (append-only, no cap; serves as inverse evidence of healthy engagement)
+
+If `.state.json` lacks this field on first run, initialize an empty structure using the template above.
+
+---
+
+## Section 13: Copyright Notice
 
 The methodology of this skill was designed and developed by **Wei63**, built on the practical experience of their personal psychological analysis project.
 All psychological frameworks are drawn from original academic literature and contain no personal user information.
